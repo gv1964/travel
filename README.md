@@ -18,7 +18,23 @@ Il manifest elenca i sorgenti (`app/main.py`, `app/ui/main_window.py`,
 il repository contiene una implementazione minimale compatibile con la struttura
 indicata, sufficiente per creare l'ambiente Python e caricare file via SFTP.
 
-## Installazione su Linux/macOS
+## Avvio rapido su Mac
+
+Il file `.bat` e' per Windows e non parte direttamente su Mac. Su macOS usare
+invece uno di questi file:
+
+- doppio click su `Avvia NormalizzaLeads.command`
+- oppure doppio click su `Avvia SpostaLeads.command`
+
+Se macOS blocca il file per i permessi, aprire il Terminale nella cartella del
+programma ed eseguire:
+
+```bash
+chmod +x "Avvia NormalizzaLeads.command" "Avvia SpostaLeads.command" scripts/start.sh
+./"Avvia NormalizzaLeads.command"
+```
+
+## Installazione su Linux/macOS da Terminale
 
 Su Ubuntu/Debian servono anche i pacchetti di sistema per creare il venv e usare
 Tkinter:

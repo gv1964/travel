@@ -22,7 +22,7 @@ EXCEL_TYPES = (
 class MainWindow(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("SpostaLeads")
+        self.title("NormalizzaLeads / SpostaLeads")
         self.geometry("720x480")
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("blue")
@@ -39,7 +39,7 @@ class MainWindow(ctk.CTk):
 
         title = ctk.CTkLabel(
             self,
-            text="SpostaLeads - caricamento Excel sul server",
+            text="NormalizzaLeads - caricamento Excel sul server",
             font=ctk.CTkFont(size=20, weight="bold"),
         )
         title.grid(row=0, column=0, padx=24, pady=(20, 8), sticky="w")
