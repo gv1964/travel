@@ -44,6 +44,13 @@ def main(argv: list[str] | None = None) -> int:
 
 def _check() -> int:
     try:
+        import customtkinter  # noqa: F401
+        import paramiko  # noqa: F401
+    except ImportError as exc:
+        print(f"Dipendenza Python mancante: {exc}", file=sys.stderr)
+        return 1
+
+    try:
         example = load_example_config()
     except ConfigError as exc:
         print(f"Configurazione esempio non valida: {exc}", file=sys.stderr)

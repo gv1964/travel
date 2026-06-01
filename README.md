@@ -20,6 +20,14 @@ indicata, sufficiente per creare l'ambiente Python e caricare file via SFTP.
 
 ## Installazione su Linux/macOS
 
+Su Ubuntu/Debian servono anche i pacchetti di sistema per creare il venv e usare
+Tkinter:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y python3.12-venv python3-tk
+```
+
 ```bash
 ./scripts/start.sh --check
 ```
