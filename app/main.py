@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from app.config import ConfigError, load_config, load_example_config
+from app.services.remote_desktop import RemoteDesktopError, RemoteDesktopLauncher
 from app.services.sftp_uploader import SftpUploader, UploadError
 from app.utils.logging_config import configure_logging
 
@@ -23,6 +24,11 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="FILE",
         help="Carica uno o piu' file Excel via SFTP senza aprire la GUI.",
     )
+    parser.add_argument(
+        "--open-remote-crm",
+        action="store_true",
+        help="Apre il CRM nel browser della sessione grafica Ubuntu remota.",
+    )
     return parser
 
 
@@ -35,6 +41,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.upload:
         return _upload(args.upload)
+
+    if args.open_remote_crm:
+        return _open_remote_crm()
 
     from app.ui.main_window import run
 
@@ -83,6 +92,18 @@ def _upload(files: list[str]) -> int:
     print("Upload completato:")
     for remote_path in uploaded:
         print(f"- {remote_path}")
+    return 0
+
+
+def _open_remote_crm() -> int:
+    try:
+        config = load_config()
+        message = RemoteDesktopLauncher(config).open_crm_import()
+    except (ConfigError, RemoteDesktopError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    print(message)
     return 0
 
 

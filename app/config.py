@@ -22,6 +22,8 @@ class ServerConfig:
     username: str
     password: str
     remote_dir: str
+    remote_desktop_dir: str
+    crm_url: str
     desktop_url: str = ""
 
     @property
@@ -35,6 +37,8 @@ class ServerConfig:
             "username": self.username,
             "password": "***" if self.password else "",
             "remote_dir": self.remote_dir,
+            "remote_desktop_dir": self.remote_desktop_dir,
+            "crm_url": self.crm_url,
             "desktop_url": self.desktop_url,
         }
 
@@ -71,11 +75,16 @@ def _parse_config(data: dict[str, Any], require_password: bool = True) -> Server
     except (TypeError, ValueError) as exc:
         raise ConfigError("Il campo 'port' deve essere un numero intero") from exc
 
+    username = str(data.get("username", ""))
+    remote_desktop_dir = str(data.get("remote_desktop_dir") or f"/home/{username}/Desktop")
+
     return ServerConfig(
         host=str(data.get("host", "")),
         port=port,
-        username=str(data.get("username", "")),
+        username=username,
         password=str(data.get("password", "")),
         remote_dir=str(data.get("remote_dir", "")),
+        remote_desktop_dir=remote_desktop_dir,
+        crm_url=str(data.get("crm_url", "https://crm.autovincenti.it")),
         desktop_url=str(data.get("desktop_url", "")),
     )

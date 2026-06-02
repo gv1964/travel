@@ -77,7 +77,31 @@ Campi principali:
 - `username`: utente SSH
 - `password`: password SSH
 - `remote_dir`: cartella remota dove caricare gli Excel
+- `remote_desktop_dir`: Desktop remoto dove si trovano i CSV normalizzati
+- `crm_url`: indirizzo del CRM da aprire sul server Ubuntu
 - `desktop_url`: link opzionale per aprire il desktop remoto/Normalizzatore
+
+## Import nel CRM dai file sul server
+
+Il selettore file del browser vede solo i file del computer su cui gira il
+browser. Se il CRM e' aperto nel Chrome del PC Windows/Mac, il browser non puo'
+mostrare direttamente `/home/ubuntu/Desktop` del server Linux.
+
+Per importare i CSV gia' normalizzati sul server:
+
+1. Aprire l'app SpostaLeads/NormalizzaLeads.
+2. Cliccare **Apri CRM sul server**.
+3. Usare il browser che si apre dentro ubuntu-desktop.
+4. Nel selettore file del CRM scegliere la cartella **Desktop** del server.
+
+Da terminale si puo' fare lo stesso con:
+
+```bash
+.venv/bin/python -m app.main --open-remote-crm
+```
+
+Questo comando apre anche il file manager del server direttamente sul Desktop e
+aggiunge il Desktop ai bookmark GTK, cosi' compare nel selettore file remoto.
 
 ## Uso CLI senza interfaccia grafica
 

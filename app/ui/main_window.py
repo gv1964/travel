@@ -9,6 +9,7 @@ from tkinter import filedialog, messagebox
 import customtkinter as ctk
 
 from app.config import ConfigError, ServerConfig, load_config
+from app.services.remote_desktop import RemoteDesktopError, RemoteDesktopLauncher
 from app.services.sftp_uploader import SftpUploader, UploadError
 
 
@@ -54,7 +55,7 @@ class MainWindow(ctk.CTk):
 
         buttons = ctk.CTkFrame(self)
         buttons.grid(row=3, column=0, padx=24, pady=12, sticky="ew")
-        buttons.grid_columnconfigure((0, 1, 2), weight=1)
+        buttons.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
         ctk.CTkButton(buttons, text="Seleziona file Excel", command=self._select_files).grid(
             row=0, column=0, padx=8, pady=8, sticky="ew"
@@ -73,6 +74,13 @@ class MainWindow(ctk.CTk):
             state="disabled",
         )
         self.desktop_button.grid(row=0, column=2, padx=8, pady=8, sticky="ew")
+        self.crm_button = ctk.CTkButton(
+            buttons,
+            text="Apri CRM sul server",
+            command=self._open_remote_crm,
+            state="disabled",
+        )
+        self.crm_button.grid(row=0, column=3, padx=8, pady=8, sticky="ew")
 
         self.status_label = ctk.CTkLabel(self, text="Pronto")
         self.status_label.grid(row=4, column=0, padx=24, pady=(0, 18), sticky="w")
@@ -89,6 +97,7 @@ class MainWindow(ctk.CTk):
             text=f"Config: {self.config.username}@{self.config.host}:{self.config.port}"
         )
         self.upload_button.configure(state="normal")
+        self.crm_button.configure(state="normal")
         if self.config.desktop_url:
             self.desktop_button.configure(state="normal")
 
@@ -143,6 +152,41 @@ class MainWindow(ctk.CTk):
     def _open_desktop(self) -> None:
         if self.config and self.config.desktop_url:
             webbrowser.open(self.config.desktop_url)
+
+    def _open_remote_crm(self) -> None:
+        if not self.config:
+            messagebox.showerror("Configurazione mancante", "Configura server.local.json.")
+            return
+
+        self.crm_button.configure(state="disabled")
+        self.status_label.configure(text="Apro il CRM sul desktop Ubuntu remoto...")
+        thread = threading.Thread(target=self._open_remote_crm_worker, daemon=True)
+        thread.start()
+
+    def _open_remote_crm_worker(self) -> None:
+        assert self.config is not None
+        try:
+            message = RemoteDesktopLauncher(self.config).open_crm_import()
+        except RemoteDesktopError as exc:
+            LOGGER.exception("Apertura CRM remoto non riuscita")
+            self.after(0, self._open_remote_crm_failed, str(exc))
+            return
+        self.after(0, self._open_remote_crm_completed, message)
+
+    def _open_remote_crm_failed(self, message: str) -> None:
+        self.crm_button.configure(state="normal")
+        self.status_label.configure(text="Apertura CRM remoto fallita")
+        messagebox.showerror("CRM remoto non avviato", message)
+
+    def _open_remote_crm_completed(self, message: str) -> None:
+        self.crm_button.configure(state="normal")
+        self.status_label.configure(text=message)
+        messagebox.showinfo(
+            "CRM aperto sul server",
+            message
+            + "\n\nNel browser del desktop Ubuntu, il selettore file vedra' "
+            + "i file del server. Usa la cartella Desktop.",
+        )
 
 
 def run() -> None:

@@ -4,5 +4,7 @@
   "username": "ubuntu",
   "password": "",
   "remote_dir": "/tmp/leads",
+  "remote_desktop_dir": "/home/ubuntu/Desktop",
+  "crm_url": "https://crm.autovincenti.it",
   "desktop_url": ""
 }
