@@ -109,6 +109,33 @@ aggiunge il Desktop ai bookmark GTK, cosi' compare nel selettore file remoto.
 .venv/bin/python -m app.main --upload file1.xlsx file2.xlsx
 ```
 
+## Errore 504 durante import CRM
+
+Un errore 504 durante l'import indica che il CRM o il proxy stanno andando in
+timeout mentre elaborano il CSV. In quel caso dividere il CSV normalizzato in
+blocchi piu' piccoli e importarli uno alla volta.
+
+Esempio sul server Ubuntu, per file con delimitatore `;`:
+
+```bash
+cd /home/ubuntu/Desktop
+python3 -m app.main --split-csv "20260531 13.57 Leads Normalizzati.csv" --rows-per-file 300
+```
+
+Il comando crea una cartella accanto al CSV originale con file:
+
+```text
+*_part001.csv
+*_part002.csv
+*_part003.csv
+```
+
+Se il CRM va ancora in 504, ridurre il blocco:
+
+```bash
+python3 -m app.main --split-csv "20260531 13.57 Leads Normalizzati.csv" --rows-per-file 100
+```
+
 ## Limite importante
 
 Il Normalizzatore Leads vero e proprio non era incluso nei TXT caricati. Questa

@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from app.config import ConfigError, load_config, load_example_config
+from app.services.csv_splitter import CsvSplitError, split_csv
 from app.services.remote_desktop import RemoteDesktopError, RemoteDesktopLauncher
 from app.services.sftp_uploader import SftpUploader, UploadError
 from app.utils.logging_config import configure_logging
@@ -29,6 +30,27 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Apre il CRM nel browser della sessione grafica Ubuntu remota.",
     )
+    parser.add_argument(
+        "--split-csv",
+        metavar="FILE",
+        help="Divide un CSV normalizzato in file piu' piccoli per evitare timeout 504.",
+    )
+    parser.add_argument(
+        "--rows-per-file",
+        type=int,
+        default=300,
+        help="Numero di record per ogni parte CSV generata da --split-csv.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        metavar="DIR",
+        help="Cartella di destinazione per i CSV divisi.",
+    )
+    parser.add_argument(
+        "--delimiter",
+        default=";",
+        help="Delimitatore CSV usato dal file normalizzato; default: ';'.",
+    )
     return parser
 
 
@@ -44,6 +66,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.open_remote_crm:
         return _open_remote_crm()
+
+    if args.split_csv:
+        return _split_csv(
+            file=args.split_csv,
+            rows_per_file=args.rows_per_file,
+            output_dir=args.output_dir,
+            delimiter=args.delimiter,
+        )
 
     from app.ui.main_window import run
 
@@ -104,6 +134,25 @@ def _open_remote_crm() -> int:
         return 1
 
     print(message)
+    return 0
+
+
+def _split_csv(file: str, rows_per_file: int, output_dir: str | None, delimiter: str) -> int:
+    try:
+        result = split_csv(
+            Path(file),
+            rows_per_file=rows_per_file,
+            output_dir=Path(output_dir) if output_dir else None,
+            delimiter=delimiter,
+        )
+    except CsvSplitError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    print(f"CSV diviso: {result.total_rows} record in {len(result.files)} file")
+    print(f"Record per file: {result.rows_per_file}")
+    for path in result.files:
+        print(f"- {path}")
     return 0
 
 
