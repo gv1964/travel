@@ -5,6 +5,6 @@
   "password": "",
   "remote_dir": "/tmp/leads",
   "remote_desktop_dir": "/home/ubuntu/Desktop",
-  "crm_url": "https://crm.autovincenti.it",
+  "crm_url": "http://crm.autovincenti.it:8082",
   "desktop_url": ""
 }

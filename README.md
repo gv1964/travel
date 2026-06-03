@@ -78,7 +78,8 @@ Campi principali:
 - `password`: password SSH
 - `remote_dir`: cartella remota dove caricare gli Excel
 - `remote_desktop_dir`: Desktop remoto dove si trovano i CSV normalizzati
-- `crm_url`: indirizzo del CRM da aprire sul server Ubuntu
+- `crm_url`: indirizzo del CRM da aprire sul server Ubuntu, preimpostato a
+  `http://crm.autovincenti.it:8082`
 - `desktop_url`: link opzionale per aprire il desktop remoto/Normalizzatore
 
 ## Import nel CRM dai file sul server

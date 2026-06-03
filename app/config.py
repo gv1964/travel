@@ -85,6 +85,6 @@ def _parse_config(data: dict[str, Any], require_password: bool = True) -> Server
         password=str(data.get("password", "")),
         remote_dir=str(data.get("remote_dir", "")),
         remote_desktop_dir=remote_desktop_dir,
-        crm_url=str(data.get("crm_url", "https://crm.autovincenti.it")),
+        crm_url=str(data.get("crm_url", "http://crm.autovincenti.it:8082")),
         desktop_url=str(data.get("desktop_url", "")),
     )
