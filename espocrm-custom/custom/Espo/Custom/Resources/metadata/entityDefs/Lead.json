@@ -1,0 +1,9 @@
+{
+  "convertFields": {
+    "Opportunity": {
+      "name": "firstName",
+      "amount": "opportunityAmount",
+      "leadSource": "source"
+    }
+  }
+}

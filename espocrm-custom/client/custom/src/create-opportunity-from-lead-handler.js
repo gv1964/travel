@@ -13,19 +13,27 @@ define(['action-handler'], (Dep) => {
         buildOpportunityName() {
             const model = this.view.model;
 
-            return model.get('accountName') ||
-                model.get('name') ||
-                [model.get('firstName'), model.get('lastName')].filter(Boolean).join(' ') ||
-                'Opportunita';
+            const parts = [
+                model.get('accountName'),
+                model.get('name'),
+                model.get('firstName'),
+                [model.get('firstName'), model.get('lastName')].filter(Boolean).join(' '),
+            ];
+
+            for (const part of parts) {
+                if (typeof part === 'string' && part.trim()) {
+                    return part.trim();
+                }
+            }
+
+            return 'Opportunita';
         }
 
         buildOpportunityData(attributes) {
             const model = this.view.model;
-            const opportunityData = {...(attributes.Opportunity || {})};
+            const opportunityData = {...(attributes.Opportunity || attributes.opportunity || {})};
 
-            if (!opportunityData.name) {
-                opportunityData.name = this.buildOpportunityName();
-            }
+            opportunityData.name = this.buildOpportunityName();
 
             if (opportunityData.amount == null && model.get('opportunityAmount') != null) {
                 opportunityData.amount = model.get('opportunityAmount');
@@ -44,6 +52,30 @@ define(['action-handler'], (Dep) => {
             }
 
             return opportunityData;
+        }
+
+        showConvertError(xhr) {
+            let message = this.view.translate('Error');
+
+            if (xhr && xhr.responseJSON) {
+                const data = xhr.responseJSON;
+
+                if (data.messageTranslation) {
+                    message = this.view.translate(
+                        data.messageTranslation.label,
+                        data.messageTranslation.scope || 'messages',
+                        data.messageTranslation.data || {}
+                    );
+                } else if (data.message) {
+                    message = data.message;
+                }
+
+                if (data.field) {
+                    message += ' (' + data.field + ')';
+                }
+            }
+
+            Espo.Ui.error(message);
         }
 
         async createOpportunityFromLead() {
@@ -82,7 +114,7 @@ define(['action-handler'], (Dep) => {
 
                 await this.view.model.fetch();
 
-                const opportunityId = response?.Opportunity?.id;
+                const opportunityId = response?.createdOpportunityId || response?.Opportunity?.id;
 
                 if (opportunityId) {
                     this.view.getRouter().navigate(
@@ -90,8 +122,8 @@ define(['action-handler'], (Dep) => {
                         {trigger: true}
                     );
                 }
-            } catch (e) {
-                Espo.Ui.error(this.view.translate('Error'));
+            } catch (xhr) {
+                this.showConvertError(xhr);
             } finally {
                 this.view.enableMenuItem(buttonName);
             }
