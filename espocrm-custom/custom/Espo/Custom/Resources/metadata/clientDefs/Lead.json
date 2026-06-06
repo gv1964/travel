@@ -1,0 +1,33 @@
+{
+  "kanbanViewMode": false,
+  "color": "#d6a2c9",
+  "iconClass": "fas fa-address-card",
+  "relationshipPanels": {
+    "tasks1": {
+      "layout": null,
+      "selectPrimaryFilterName": null
+    },
+    "tasks": {
+      "layout": null,
+      "selectPrimaryFilterName": null
+    }
+  },
+  "menu": {
+    "detail": {
+      "buttons": [
+        "__APPEND__",
+        {
+          "name": "createOpportunityFromLead",
+          "label": "Trasforma in Opportunità",
+          "style": "success",
+          "acl": "edit",
+          "aclScope": "Lead",
+          "handler": "custom:create-opportunity-from-lead-handler",
+          "initFunction": "initCreateOpportunityFromLead",
+          "actionFunction": "createOpportunityFromLead",
+          "checkVisibilityFunction": "isCreateOpportunityFromLeadVisible"
+        }
+      ]
+    }
+  }
+}
