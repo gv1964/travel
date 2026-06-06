@@ -10,12 +10,48 @@ define(['action-handler'], (Dep) => {
             return !['Converted', 'Dead', 'Recycled'].includes(status);
         }
 
+        buildOpportunityName() {
+            const model = this.view.model;
+
+            return model.get('accountName') ||
+                model.get('name') ||
+                [model.get('firstName'), model.get('lastName')].filter(Boolean).join(' ') ||
+                'Opportunita';
+        }
+
+        buildOpportunityData(attributes) {
+            const model = this.view.model;
+            const opportunityData = {...(attributes.Opportunity || {})};
+
+            if (!opportunityData.name) {
+                opportunityData.name = this.buildOpportunityName();
+            }
+
+            if (opportunityData.amount == null && model.get('opportunityAmount') != null) {
+                opportunityData.amount = model.get('opportunityAmount');
+            }
+
+            if (!opportunityData.leadSource && model.get('source')) {
+                opportunityData.leadSource = model.get('source');
+            }
+
+            if (!opportunityData.assignedUserId && model.get('assignedUserId')) {
+                opportunityData.assignedUserId = model.get('assignedUserId');
+            }
+
+            if (!opportunityData.assignedUserName && model.get('assignedUserName')) {
+                opportunityData.assignedUserName = model.get('assignedUserName');
+            }
+
+            return opportunityData;
+        }
+
         async createOpportunityFromLead() {
             const buttonName = 'createOpportunityFromLead';
 
             const confirmed = await new Promise(resolve => {
                 this.view.confirm({
-                    message: 'Creare un\'Opportunità da questo Lead?',
+                    message: 'Creare un\'Opportunita da questo Lead?',
                     confirmText: 'Converti',
                 }, () => resolve(true));
 
@@ -33,10 +69,12 @@ define(['action-handler'], (Dep) => {
                     id: this.view.model.id,
                 });
 
+                const opportunityData = this.buildOpportunityData(attributes);
+
                 const response = await Espo.Ajax.postRequest('Lead/action/convert', {
                     id: this.view.model.id,
                     records: {
-                        Opportunity: attributes.Opportunity || {},
+                        Opportunity: opportunityData,
                     },
                 });
 
