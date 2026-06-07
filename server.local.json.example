@@ -1,0 +1,10 @@
+{
+  "host": "164.132.43.122",
+  "port": 22,
+  "username": "ubuntu",
+  "password": "",
+  "remote_dir": "/home/ubuntu/Desktop/Leads",
+  "remote_desktop_dir": "/home/ubuntu/Desktop",
+  "crm_url": "http://crm.autovincenti.it:8082",
+  "desktop_url": ""
+}
