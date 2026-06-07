@@ -6,6 +6,7 @@ import shlex
 import paramiko
 
 from app.config import ServerConfig
+from app.services.ssh_client import connect_ssh
 
 
 LOGGER = logging.getLogger(__name__)
@@ -41,18 +42,7 @@ class RemoteDesktopLauncher:
         return output or "CRM aperto sul desktop Ubuntu remoto"
 
     def _connect(self) -> paramiko.SSHClient:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(
-            hostname=self.config.host,
-            port=self.config.port,
-            username=self.config.username,
-            password=self.config.password,
-            timeout=20,
-            banner_timeout=20,
-            auth_timeout=20,
-        )
-        return client
+        return connect_ssh(self.config)
 
 
 def _build_open_crm_script(crm_url: str, desktop_dir: str) -> str:

@@ -7,6 +7,7 @@ from typing import Iterable
 import paramiko
 
 from app.config import ServerConfig
+from app.services.ssh_client import SshConnectionError, connect_ssh
 
 
 LOGGER = logging.getLogger(__name__)
@@ -42,24 +43,15 @@ class SftpUploader:
                         uploaded.append(remote_path)
                 finally:
                     sftp.close()
+        except SshConnectionError as exc:
+            raise UploadError(str(exc)) from exc
         except Exception as exc:  # paramiko raises several transport/auth exceptions.
             raise UploadError(f"Upload fallito: {exc}") from exc
 
         return uploaded
 
     def _connect(self) -> paramiko.SSHClient:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(
-            hostname=self.config.host,
-            port=self.config.port,
-            username=self.config.username,
-            password=self.config.password,
-            timeout=20,
-            banner_timeout=20,
-            auth_timeout=20,
-        )
-        return client
+        return connect_ssh(self.config)
 
     @staticmethod
     def _ensure_remote_dir(sftp: paramiko.SFTPClient, remote_dir: str) -> None:

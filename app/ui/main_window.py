@@ -28,8 +28,8 @@ class MainWindow(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
         self.title("SpostaLeads")
-        self.geometry("760x520")
-        self.minsize(700, 480)
+        self.geometry("760x560")
+        self.minsize(700, 520)
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
 
@@ -74,14 +74,15 @@ class MainWindow(ctk.CTk):
         )
         self.host_entry = self._add_text_field(form, row=2, label="Server Linux")
         self.user_entry = self._add_text_field(form, row=3, label="Utente SSH")
-        self.remote_dir_entry = self._add_text_field(form, row=4, label="Cartella remota Linux")
+        self.password_entry = self._add_password_field(form, row=4, label="Password SSH")
+        self.remote_dir_entry = self._add_text_field(form, row=5, label="Cartella remota Linux")
 
         ctk.CTkLabel(
             form,
             text="* Almeno uno tra Instagram e TikTok; l'altro puo' restare vuoto.",
             text_color="gray",
             font=ctk.CTkFont(size=12),
-        ).grid(row=5, column=0, columnspan=3, padx=(0, 8), pady=(8, 0), sticky="w")
+        ).grid(row=6, column=0, columnspan=3, padx=(0, 8), pady=(8, 0), sticky="w")
 
         self.progress_bar = ctk.CTkProgressBar(self)
         self.progress_bar.grid(row=2, column=0, padx=24, pady=(0, 6), sticky="ew")
@@ -158,6 +159,14 @@ class MainWindow(ctk.CTk):
         entry.grid(row=row, column=1, columnspan=2, pady=10, sticky="ew")
         return entry
 
+    def _add_password_field(self, parent: ctk.CTkFrame, row: int, label: str) -> ctk.CTkEntry:
+        ctk.CTkLabel(parent, text=f"{label} *:").grid(
+            row=row, column=0, padx=(0, 12), pady=10, sticky="w"
+        )
+        entry = ctk.CTkEntry(parent, show="*")
+        entry.grid(row=row, column=1, columnspan=2, pady=10, sticky="ew")
+        return entry
+
     def _load_defaults(self) -> None:
         self.host_entry.insert(0, DEFAULT_HOST)
         self.user_entry.insert(0, DEFAULT_USERNAME)
@@ -179,6 +188,7 @@ class MainWindow(ctk.CTk):
 
         self._set_entry(self.host_entry, config.host)
         self._set_entry(self.user_entry, config.username)
+        self._set_entry(self.password_entry, config.password)
         self._set_entry(self.remote_dir_entry, config.remote_dir or config.remote_desktop_dir)
 
     @staticmethod
@@ -235,22 +245,21 @@ class MainWindow(ctk.CTk):
             if path_text and not Path(path_text).expanduser().is_file():
                 return f"File non trovato: {path_text}"
 
-        if not self._password and not DEFAULT_CONFIG_PATH.exists():
-            return (
-                "Password SSH mancante. Copia server.local.json.example in "
-                "server.local.json e inserisci la password."
-            )
+        password = self.password_entry.get().strip() or self._password
+        if not password:
+            return "Inserisci la password SSH nel campo Password SSH."
 
         return None
 
     def _build_config_from_form(self) -> ServerConfig:
         username = self.user_entry.get().strip()
         remote_dir = self.remote_dir_entry.get().strip()
+        password = self.password_entry.get().strip() or self._password
         return ServerConfig(
             host=self.host_entry.get().strip(),
             port=22,
             username=username,
-            password=self._password,
+            password=password,
             remote_dir=remote_dir,
             remote_desktop_dir=remote_dir,
             crm_url=self._crm_url,
@@ -263,6 +272,7 @@ class MainWindow(ctk.CTk):
             self.tiktok_entry,
             self.host_entry,
             self.user_entry,
+            self.password_entry,
             self.remote_dir_entry,
         ):
             entry.delete(0, "end")
@@ -270,6 +280,8 @@ class MainWindow(ctk.CTk):
         self.host_entry.insert(0, DEFAULT_HOST)
         self.user_entry.insert(0, DEFAULT_USERNAME)
         self.remote_dir_entry.insert(0, DEFAULT_REMOTE_DIR)
+        if self._password:
+            self.password_entry.insert(0, self._password)
         self.progress_bar.set(0)
         self._transferred_count = 0
         self._update_transfer_counter(0)
