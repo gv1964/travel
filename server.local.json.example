@@ -3,7 +3,7 @@
   "port": 22,
   "username": "ubuntu",
   "password": "",
-  "remote_dir": "/tmp/leads",
+  "remote_dir": "/home/ubuntu/Desktop/Leads",
   "remote_desktop_dir": "/home/ubuntu/Desktop",
   "crm_url": "http://crm.autovincenti.it:8082",
   "desktop_url": ""
