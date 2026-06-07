@@ -57,7 +57,7 @@ class MainWindow(ctk.CTk):
         ).grid(row=0, column=0, padx=24, pady=(18, 4), sticky="w")
         ctk.CTkLabel(
             header,
-            text="Carica i file Excel Instagram e TikTok sul desktop Ubuntu (cartella Leads)",
+            text="Carica uno o due file Excel (Instagram e/o TikTok) sul desktop Ubuntu",
             font=ctk.CTkFont(size=13),
             text_color="white",
         ).grid(row=1, column=0, padx=24, pady=(0, 18), sticky="w")
@@ -67,10 +67,10 @@ class MainWindow(ctk.CTk):
         form.grid_columnconfigure(1, weight=1)
 
         self.instagram_entry = self._add_path_field(
-            form, row=0, label="Leads Instagram", optional=True
+            form, row=0, label="Leads Instagram (opzionale)"
         )
         self.tiktok_entry = self._add_path_field(
-            form, row=1, label="Leads TikTok", optional=True
+            form, row=1, label="Leads TikTok (opzionale)"
         )
         self.host_entry = self._add_text_field(form, row=2, label="Server Linux")
         self.user_entry = self._add_text_field(form, row=3, label="Utente SSH")
@@ -79,7 +79,7 @@ class MainWindow(ctk.CTk):
 
         ctk.CTkLabel(
             form,
-            text="* Almeno uno tra Instagram e TikTok; l'altro puo' restare vuoto.",
+            text="* Basta un solo file: compila Instagram oppure TikTok, l'altro campo puo' restare vuoto.",
             text_color="gray",
             font=ctk.CTkFont(size=12),
         ).grid(row=6, column=0, columnspan=3, padx=(0, 8), pady=(8, 0), sticky="w")
@@ -135,10 +135,8 @@ class MainWindow(ctk.CTk):
         parent: ctk.CTkFrame,
         row: int,
         label: str,
-        optional: bool = False,
     ) -> ctk.CTkEntry:
-        suffix = "" if optional else " *"
-        ctk.CTkLabel(parent, text=f"{label}{suffix}:").grid(
+        ctk.CTkLabel(parent, text=f"{label}:").grid(
             row=row, column=0, padx=(0, 12), pady=10, sticky="w"
         )
         entry = ctk.CTkEntry(parent)
